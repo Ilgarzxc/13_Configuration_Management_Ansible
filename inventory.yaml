@@ -1,0 +1,5 @@
+all:
+  hosts:
+    79.76.50.85:
+      ansible_host: 79.76.50.85
+      ansible_user: ubuntu
