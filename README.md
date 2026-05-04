@@ -19,3 +19,10 @@ if we dive deeper and set up ansible.cfg (local config for ansible connection) w
 
 ### Useful commands
 `ansible all --list-hosts`
+`ansible all -m gather_facts`
+`ansible all -m apt -a update_cache=true`
+`ansible all -m apt -a update_cache=true --become --ask-become-pass`
+`ansible all -m apt -a name=vim-nox --become --ask-become-pass`
+`ansible all -m apt -a "name=snapd state=latest" --become --ask-become-pass`
+`ansible all -m apt -a "upgrade=dist" --become --ask-become-pass`
+`ansible-playbook --ask-become-pass {playbook location}`
