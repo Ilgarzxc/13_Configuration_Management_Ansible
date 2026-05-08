@@ -1,0 +1,7 @@
+---
+# Reload nginx when config changed
+
+- name: reload nginx
+  ansible.builtin.systemd_service:
+    name: nginx
+    state: reloaded

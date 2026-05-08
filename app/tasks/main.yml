@@ -1,0 +1,28 @@
+---
+# Uploads the given tarball of a static html website to the server
+# and unzip it
+  
+- name: Upload site archive
+  copy:
+    src: static_site.tar.gz
+    dest: /tmp/static_site.tar.gz
+
+- name: App folder clean up
+  ansible.builtin.file:
+    path: /var/www/app
+    state: absent
+
+- name: Recreate app directory
+  file:
+    path: /var/www/app
+    state: directory
+    owner: www-data
+    group: www-data
+    mode: '0755'
+
+- name: Extract website archive
+  unarchive:
+    src: /tmp/static_site.tar.gz
+    dest: /var/www/app
+    remote_src: yes
+  notify: reload nginx
