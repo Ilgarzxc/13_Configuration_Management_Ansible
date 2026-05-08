@@ -1,0 +1,52 @@
+---
+# basic server setup (installs utilities, updates the server, installs fail2ban and ufw with policies, etc.)
+
+- name: System update
+  apt: 
+    update_cache: yes
+    upgrade: dist
+  when: ansible_facts['os_family'] == 'Debian'
+
+- name: Basic Packages Installation (git, ufw, vim, fail2ban)
+  apt:
+    name:
+      - git
+      - ufw
+      - vim
+      - fail2ban
+    state: present
+  when: ansible_facts['os_family'] == 'Debian'
+
+- name: Deny incoming traffic
+  community.general.ufw:
+    direction: "incoming"
+    policy: "deny"
+
+- name: Allow outgoing traffic
+  community.general.ufw:
+    direction: "outgoing"
+    policy: "allow"
+
+- name: Allow TCP traffic for 22, 80 and 443 ports
+  community.general.ufw:
+    rule: allow
+    port: "{{ item }}"
+    proto: tcp
+  loop:
+    - 22
+    - 80
+    - 443
+
+- name: Enable UFW 
+  community.general.ufw:
+    state: enabled
+
+
+- name: Start fail2ban service
+  service: 
+    name: fail2ban
+    state: started
+    enabled: yes
+  when: ansible_facts['os_family'] == 'Debian'
+
+    

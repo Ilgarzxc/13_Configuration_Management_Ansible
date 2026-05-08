@@ -13,8 +13,7 @@ or if you configured *.yaml file as I did in the repository:
 `ansible all -i {inventory file location} -m ping`
 if we dive deeper and set up ansible.cfg (local config for ansible connection) with a few variables - you can shorten it down to `ansible all -m ping`
 
-
-## Ansible Playbook Configuration
+## Ansible Roles and Folder Structure
 
 
 ### Useful commands
