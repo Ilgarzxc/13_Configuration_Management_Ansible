@@ -1,0 +1,96 @@
+---
+# Install and configure nginx
+
+- name: Install nginx
+  apt:
+    name: nginx
+    state: present
+    update_cache: yes
+  when: ansible_facts['os_family'] == 'Debian'
+
+- name: Enable and start nginx
+  ansible.builtin.systemd_service:
+    enabled: true
+    state: started
+    name: nginx
+
+- name: Clone a repo to tmp folder and use refspec to fetch all pull requests
+  ansible.builtin.git:
+    repo: 'https://github.com/Ilgarzxc/06_Static_Site_Server'
+    dest: /tmp/checkout
+    refspec: '+refs/pull/*:refs/heads/*'
+
+- name: Cleanup of /var/www/app
+  file:
+    path: /var/www/app
+    state: absent
+
+- name: Recreate app directory
+  file:
+    path: /var/www/app
+    state: directory
+    owner: www-data
+    group: www-data
+    mode: '0755'
+
+
+- name: Copy source files securely (without .git and configs)
+  ansible.posix.synchronize:
+    src: /tmp/checkout
+    dest: /var/www/app
+    rsync_opts:
+      - "--exclude=.git"
+      - "--exclude=.env"
+
+- name: Set correct access rights for www-data
+  file:
+    path: /var/www/app
+    state: directory
+    owner: www-data
+    group: www-data
+    recurse: yes
+
+- name: find directories and save them into variable
+  find:
+    path: /var/www/app
+    recurse: yes
+    file_type: directory
+  register: found_directories
+
+- name: find files and save them into variable
+  find:
+    path: /var/www/app
+    recurse: yes
+    file_type: file
+  register: found_files
+
+- name: apply required chmod to the folders
+  file:
+    path: "{{ item.path }}"
+    mode: '0755'
+  loop: "{{ found_directories.files }}"
+
+- name: apply required chmod to the files
+  file:
+    path: "{{ item.path }}"
+    mode: '0644'
+  loop: "{{ found_files.files }}"
+
+- name: change owner of app folder
+  file:
+    path: /var/www/app
+    owner: www-data
+    group: www-data
+    recurse: yes
+
+- name: Remove default nginx site
+  file: 
+    path: /etc/nginx/sites-enabled/default
+    state: absent
+
+- name: Reload nginx systemd service
+  ansible.builtin.systemd_service:
+    name: nginx
+    state: restarted
+    daemon_reload: true
+

@@ -1,0 +1,24 @@
+---
+
+- name: Verify if ssh connection allowed with UWF
+  community.general.ufw:
+    rule: allow
+    port: '22'
+    proto: tcp
+
+- name: Check if authorized keys file exist
+  file:
+    path: /home/{{ ansible_user }}/.ssh/authorized_keys
+    state: touch
+    owner: '{{ ansible_user }}'
+    group: '{{ ansible_group }}'
+    mode: '600'
+
+- name: Copy public keys to authorized keys
+  ansible.posix.authorized_key:
+    user: ubuntu
+    state: present
+    key: '{{ item }}'
+  with_file:
+    - ansible.pub
+    - id_ed25519.pub

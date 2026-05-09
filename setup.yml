@@ -6,3 +6,5 @@
     - { role: base, tags: ['base']}
     - { role: nginx, tags: ['nginx']}
     - { role: app, tags: ['app']}
+    - { role: ssh, tags: ['ssh']}
+    - { role: site_from_git, tags: ['site_from_git']}
