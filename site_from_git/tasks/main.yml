@@ -1,9 +1,11 @@
 ---
 # Install and configure nginx
 
-- name: Install nginx
+- name: Install nginx and rsync
   apt:
-    name: nginx
+    name: 
+    - nginx
+    - rsync
     state: present
     update_cache: yes
   when: ansible_facts['os_family'] == 'Debian'
@@ -19,6 +21,7 @@
     repo: 'https://github.com/Ilgarzxc/06_Static_Site_Server'
     dest: /tmp/checkout
     refspec: '+refs/pull/*:refs/heads/*'
+  delegate_to: localhost
 
 - name: Cleanup of /var/www/app
   file:
